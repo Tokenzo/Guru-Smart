@@ -1,5 +1,8 @@
-# Object file
-*.o
-
-# Ada Library Information
-*.ali
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example

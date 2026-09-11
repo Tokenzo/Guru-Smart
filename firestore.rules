@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'SUPER_ADMIN' ||
+        getUserData().role == 'SUPER_ADMIN'
+      );
+    }
+
+    function isSchoolAdmin(schoolId) {
+      return isAuthenticated() && (
+        isSuperAdmin() ||
+        (getUserData().schoolId == schoolId && (getUserData().role == 'KEPALA_SEKOLAH' || getUserData().role == 'SUPER_ADMIN'))
+      );
+    }
+
+    function belongsToSchool(schoolId) {
+      return isAuthenticated() && (
+        isSuperAdmin() ||
+        getUserData().schoolId == schoolId
+      );
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin() || belongsToSchool(resource.data.schoolId));
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+    }
+
+    // Schools
+    match /schools/{schoolId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && (isSuperAdmin() || isSchoolAdmin(schoolId));
+      allow delete: if isSuperAdmin();
+    }
+
+    // School Years
+    match /school_years/{yearId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (isSuperAdmin() || isSchoolAdmin(request.resource.data.schoolId));
+    }
+
+    // School Members
+    match /school_members/{memberId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (isSuperAdmin() || isSchoolAdmin(request.resource.data.schoolId));
+    }
+
+    // Rapor Reports
+    match /rapor_reports/{reportId} {
+      allow read: if isAuthenticated() && belongsToSchool(resource.data.schoolId);
+      allow create: if isAuthenticated() && belongsToSchool(request.resource.data.schoolId);
+      allow update, delete: if isAuthenticated() && isSchoolAdmin(resource.data.schoolId);
+    }
+
+    // Rapor Indicators
+    match /rapor_indicators/{indicatorId} {
+      allow read: if isAuthenticated() && belongsToSchool(resource.data.schoolId);
+      allow write: if isAuthenticated() && (isSuperAdmin() || isSchoolAdmin(request.resource.data.schoolId));
+    }
+
+    // Rapor Recommendations
+    match /rapor_recommendations/{recId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isSuperAdmin();
+    }
+
+    // Rapor Priorities
+    match /rapor_priorities/{priorityId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isSuperAdmin();
+    }
+
+    // Rapor Root Causes
+    match /rapor_root_causes/{causeId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isSuperAdmin();
+    }
+
+    // AI Analyses
+    match /ai_analyses/{analysisId} {
+      allow read: if isAuthenticated() && belongsToSchool(resource.data.schoolId);
+      allow create, update: if isAuthenticated() && belongsToSchool(request.resource.data.schoolId);
+      allow delete: if isAuthenticated() && isSchoolAdmin(resource.data.schoolId);
+    }
+
+    // Audit Logs
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated() && belongsToSchool(resource.data.schoolId);
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Immutable audit log
+    }
+  }
+}

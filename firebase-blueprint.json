@@ -1,0 +1,224 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Pengguna platform GURU SMART",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["SUPER_ADMIN", "PENGAWAS", "KEPALA_SEKOLAH", "GURU", "SISWA", "ORANG_TUA"] },
+        "schoolId": { "type": "string" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "role", "active"]
+    },
+    "School": {
+      "title": "School",
+      "description": "Informasi profil satuan pendidikan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolName": { "type": "string" },
+        "schoolCode": { "type": "string" },
+        "npsn": { "type": "string" },
+        "address": { "type": "string" },
+        "kabupaten": { "type": "string" },
+        "province": { "type": "string" },
+        "principalName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "schoolName", "npsn", "kabupaten", "province", "principalName"]
+    },
+    "SchoolYear": {
+      "title": "SchoolYear",
+      "description": "Tahun ajaran dan semester aktif",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "year": { "type": "string" },
+        "semester": { "type": "string" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "schoolId", "year", "semester", "active"]
+    },
+    "SchoolMember": {
+      "title": "SchoolMember",
+      "description": "Relasi anggota sekolah dan penugasan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "userId": { "type": "string" },
+        "role": { "type": "string" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "schoolId", "userId", "role", "active"]
+    },
+    "RaporReport": {
+      "title": "RaporReport",
+      "description": "Laporan Rapor Pendidikan tahunan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "schoolYearId": { "type": "string" },
+        "fileName": { "type": "string" },
+        "fileUrl": { "type": "string" },
+        "reportYear": { "type": "string" },
+        "uploadedBy": { "type": "string" },
+        "uploadedAt": { "type": "string" },
+        "processingStatus": { "type": "string", "enum": ["COMPLETED", "PROCESSING", "FAILED"] }
+      },
+      "required": ["id", "schoolId", "reportYear", "uploadedBy", "uploadedAt", "processingStatus"]
+    },
+    "RaporIndicator": {
+      "title": "RaporIndicator",
+      "description": "Indikator capaian mutu rapor pendidikan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reportId": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "value": { "type": "number" },
+        "category": { "type": "string" },
+        "achievement": { "type": "string" },
+        "description": { "type": "string" },
+        "sourceSheet": { "type": "string" },
+        "sourceRow": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "reportId", "schoolId", "code", "name", "achievement"]
+    },
+    "RaporRecommendation": {
+      "title": "RaporRecommendation",
+      "description": "Rekomendasi pembenahan berbasis data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reportId": { "type": "string" },
+        "indicatorId": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "reportId", "indicatorId", "recommendation"]
+    },
+    "RaporPriority": {
+      "title": "RaporPriority",
+      "description": "Indikator prioritas intervensi",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reportId": { "type": "string" },
+        "indicatorId": { "type": "string" },
+        "priorityRank": { "type": "number" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "reportId", "indicatorId", "priorityRank"]
+    },
+    "RaporRootCause": {
+      "title": "RaporRootCause",
+      "description": "Identifikasi akar masalah capaian rendah",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reportId": { "type": "string" },
+        "indicatorId": { "type": "string" },
+        "rootCause": { "type": "string" },
+        "source": { "type": "string" },
+        "confidence": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "reportId", "indicatorId", "rootCause"]
+    },
+    "AiAnalysis": {
+      "title": "AiAnalysis",
+      "description": "Hasil analisis AI School Analyst",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "reportId": { "type": "string" },
+        "analysisType": { "type": "string" },
+        "inputData": { "type": "object" },
+        "result": { "type": "object" },
+        "sourceReferences": { "type": "array" },
+        "status": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "schoolId", "reportId", "analysisType", "result", "status", "createdAt"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Catatan audit aktivitas pengguna",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "schoolId": { "type": "string" },
+        "action": { "type": "string" },
+        "entity": { "type": "string" },
+        "entityId": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["id", "userId", "schoolId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Data profil pengguna"
+    },
+    "/schools/{schoolId}": {
+      "schema": "School",
+      "description": "Data sekolah"
+    },
+    "/school_years/{yearId}": {
+      "schema": "SchoolYear",
+      "description": "Tahun ajaran"
+    },
+    "/school_members/{memberId}": {
+      "schema": "SchoolMember",
+      "description": "Penugasan anggota sekolah"
+    },
+    "/rapor_reports/{reportId}": {
+      "schema": "RaporReport",
+      "description": "Laporan Rapor Pendidikan"
+    },
+    "/rapor_indicators/{indicatorId}": {
+      "schema": "RaporIndicator",
+      "description": "Indikator Rapor"
+    },
+    "/rapor_recommendations/{recId}": {
+      "schema": "RaporRecommendation",
+      "description": "Rekomendasi Pembenahan"
+    },
+    "/rapor_priorities/{priorityId}": {
+      "schema": "RaporPriority",
+      "description": "Prioritas Rapor"
+    },
+    "/rapor_root_causes/{causeId}": {
+      "schema": "RaporRootCause",
+      "description": "Akar Masalah Rapor"
+    },
+    "/ai_analyses/{analysisId}": {
+      "schema": "AiAnalysis",
+      "description": "Riwayat Analisis AI"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Audit aktivitas"
+    }
+  }
+}
